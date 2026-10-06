@@ -1,0 +1,12 @@
+{
+  "name": "tu-casa-nordica-email-automation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "send": "node send-pending.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "^7.0.10"
+  }
+}
