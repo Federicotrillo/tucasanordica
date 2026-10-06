@@ -89,12 +89,27 @@ console.log(`Processing ${messages.length} message(s).`);
 
 let failures = 0;
 
-for (const message of messages) {
-  const id = messageValue(message, "id", "outboxId", "queueId");
-  const recipient = messageValue(message, "recipient", "to");
-  const subject = messageValue(message, "subject");
-  const html = messageValue(message, "htmlBody", "html");
-  const text = messageValue(message, "textBody", "text");
+for (const queuedMessage of messages) {
+  let nested = {};
+  const rawPayload = messageValue(queuedMessage, "payload", "payloadJson", "payload_json");
+  if (typeof rawPayload === "string") {
+    try {
+      nested = JSON.parse(rawPayload);
+    } catch {
+      nested = {};
+    }
+  } else if (rawPayload && typeof rawPayload === "object") {
+    nested = rawPayload;
+  }
+
+  const message = { ...queuedMessage, ...nested };
+  console.log("Queue item fields:", Object.keys(message).sort().join(","));
+
+  const id = messageValue(message, "id", "outboxId", "outbox_id", "queueId", "queue_id");
+  const recipient = messageValue(message, "recipient", "recipientEmail", "recipient_email", "to", "email");
+  const subject = messageValue(message, "subject", "emailSubject", "email_subject");
+  const html = messageValue(message, "htmlBody", "html_body", "bodyHtml", "body_html", "html");
+  const text = messageValue(message, "textBody", "text_body", "bodyText", "body_text", "text");
 
   if (!id || !recipient || !subject || (!html && !text)) {
     failures += 1;
