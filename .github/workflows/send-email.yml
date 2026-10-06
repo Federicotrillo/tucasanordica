@@ -1,0 +1,36 @@
+name: Enviar correos transaccionales
+
+on:
+  schedule:
+    - cron: "3-59/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: transactional-email-sender
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Descargar automatización
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar dependencias
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Enviar cola pendiente
+        run: npm run send
+        env:
+          APP_URL: https://mi-casa-nordica.microline1982.chatgpt.site
+          MAILER_API_KEY: ${{ secrets.MAILER_API_KEY }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
