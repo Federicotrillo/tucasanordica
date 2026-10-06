@@ -60,11 +60,28 @@ function messageValue(message, ...keys) {
   return undefined;
 }
 
+const transporter = nodemailer.createTransport({
+  host: "authsmtp.securemail.pro",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "info@tucasanordica.es",
+    pass: SMTP_PASSWORD,
+  },
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 30000,
+});
+
+await transporter.verify();
+console.log("SMTP connection verified.");
+
 const payload = await queueRequest("GET");
 const messages = extractMessages(payload);
 
 if (messages.length === 0) {
   console.log("No pending transactional emails.");
+  transporter.close();
   process.exit(0);
 }
 
@@ -82,7 +99,7 @@ const transporter = nodemailer.createTransport({
 });
 
 await transporter.verify();
-console.log(`SMTP connection verified. Processing ${messages.length} message(s).`);
+console.log(`Processing ${messages.length} message(s).`);
 
 let failures = 0;
 
