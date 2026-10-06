@@ -85,20 +85,6 @@ if (messages.length === 0) {
   process.exit(0);
 }
 
-const transporter = nodemailer.createTransport({
-  host: "authsmtp.securemail.pro",
-  port: 465,
-  secure: true,
-  auth: {
-    user: "info@tucasanordica.es",
-    pass: SMTP_PASSWORD,
-  },
-  connectionTimeout: 20000,
-  greetingTimeout: 20000,
-  socketTimeout: 30000,
-});
-
-await transporter.verify();
 console.log(`Processing ${messages.length} message(s).`);
 
 let failures = 0;
